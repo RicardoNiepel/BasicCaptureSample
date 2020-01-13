@@ -3,11 +3,15 @@ using System;
 using System.Numerics;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
+using Windows.Foundation;
 using Windows.Graphics.Capture;
 using Windows.UI;
 using Windows.UI.Composition;
 using Windows.UI.Core;
 using Windows.UI.Popups;
+using Windows.UI.ViewManagement;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 
 namespace BasicCaptureSample
 {
@@ -18,15 +22,26 @@ namespace BasicCaptureSample
             _view = applicationView;
         }
 
+
         public void SetWindow(CoreWindow window)
         {
             _window = window;
+            
         }
 
         public void Load(string entryPoint) { }
 
         public void Run()
         {
+            ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
+            ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(1280, 1024));
+
+            ApplicationViewTitleBar formattableTitleBar = ApplicationView.GetForCurrentView().TitleBar;
+            formattableTitleBar.ButtonForegroundColor = Windows.UI.Colors.Transparent;
+            formattableTitleBar.ButtonBackgroundColor = Windows.UI.Colors.Transparent;
+            CoreApplicationViewTitleBar coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
+            coreTitleBar.ExtendViewIntoTitleBar = true;
+
             _compositor = new Compositor();
             _target = _compositor.CreateTargetForCurrentView();
             _root = _compositor.CreateSpriteVisual();
@@ -39,17 +54,21 @@ namespace BasicCaptureSample
 
             if (GraphicsCaptureSession.IsSupported())
             {
-                _content.AnchorPoint = new Vector2(0.5f, 0.5f);
-                _content.RelativeOffsetAdjustment = new Vector3(0.5f, 0.5f, 0);
+                //_content.AnchorPoint = new Vector2(0.5f, 0.5f);
+                //_content.RelativeOffsetAdjustment = new Vector3(0.5f, 0.5f, 0);
+                _content.AnchorPoint = new Vector2(0, 0);
+                _content.RelativeOffsetAdjustment = new Vector3(0, 0, 0);
                 _content.RelativeSizeAdjustment = Vector2.One;
-                _content.Size = new Vector2(-80, -80);
+                _content.Size = new Vector2(0, 0);
                 _content.Brush = _brush;
-                _brush.HorizontalAlignmentRatio = 0.5f;
-                _brush.VerticalAlignmentRatio = 0.5f;
+                //_brush.HorizontalAlignmentRatio = 0.5f;
+                //_brush.VerticalAlignmentRatio = 0.5f; 
+                _brush.HorizontalAlignmentRatio = 0;
+                _brush.VerticalAlignmentRatio = 0;
                 _brush.Stretch = CompositionStretch.Uniform;
-                var shadow = _compositor.CreateDropShadow();
-                shadow.Mask = _brush;
-                _content.Shadow = shadow;
+                //var shadow = _compositor.CreateDropShadow();
+                //shadow.Mask = _brush;
+                //_content.Shadow = shadow;
                 _root.Children.InsertAtTop(_content);
 
                 _device = new CanvasDevice();
@@ -74,7 +93,7 @@ namespace BasicCaptureSample
                     await dialog.ShowAsync();
                 });
             }
-            
+
             _window.Activate();
             _window.Dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessUntilQuit);
         }

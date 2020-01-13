@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.Foundation;
 using Windows.Graphics;
 using Windows.Graphics.Capture;
 using Windows.Graphics.DirectX;
@@ -23,7 +24,8 @@ namespace BasicCaptureSample
             _device = device;
 
             // TODO: Dpi?
-            _swapChain = new CanvasSwapChain(_device, item.Size.Width, item.Size.Height, 96);
+            //_swapChain = new CanvasSwapChain(_device, item.Size.Width, item.Size.Height, 96);
+            _swapChain = new CanvasSwapChain(_device, 1280, 1024, 96);
 
             _dispatcherQueueController = DispatcherQueueController.CreateOnDedicatedThread();
             _dispatcherQueue = _dispatcherQueueController.DispatcherQueue;
@@ -100,12 +102,14 @@ namespace BasicCaptureSample
                     newSize = true;
                     _lastSize = frame.ContentSize;
                     _swapChain.ResizeBuffers(_lastSize.Width, _lastSize.Height);
+                    //_swapChain.ResizeBuffers(1280, 1024);
                 }
 
                 using (var bitmap = CanvasBitmap.CreateFromDirect3D11Surface(_device, frame.Surface))
                 using (var drawingSession = _swapChain.CreateDrawingSession(Colors.Transparent))
                 {
-                    drawingSession.DrawImage(bitmap);
+                    drawingSession.DrawImage(bitmap, new System.Numerics.Vector2(0,0), new Rect(0,0, 1280, 1024));
+                    //drawingSession.DrawImage(bitmap);
                 }
 
             } // retire the frame
